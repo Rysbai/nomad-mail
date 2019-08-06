@@ -8,8 +8,12 @@ class Event(models.Model):
     excel_file = models.FileField(upload_to="event/")
 
     def save(self, *args, **kwargs):
+        is_create = False
+        if self._state.adding:
+            is_create = True
+
         super().save(*args, **kwargs)
-        if self.pk is None:
+        if is_create:
             Recipient.create_mass_recipients(self.id, parse_xls(self.excel_file.path))
 
     def __str__(self):
