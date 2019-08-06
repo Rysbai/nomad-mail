@@ -48,9 +48,6 @@ INSTALLED_APPS = [
 ]
 
 # CELERY
-djcelery.setup_loader()
-
-django_heroku.settings(locals())
 
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -160,3 +157,7 @@ WORKER_PREFETCH_MULTIPLIER = 1
 WORKER_CONCURRENCY = 50
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 # CELERY_BROKER_URL = "amqp://guest:**@127.0.0.1:5672//"
+
+
+django_heroku.settings(locals())
+# djcelery.setup_loader()
