@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'event.apps.EventConfig',
     'ckeditor',
     'distribution.apps.DistributionConfig',
-    'djcelery'
 ]
 
 # CELERY
@@ -158,7 +157,7 @@ WORKER_CONCURRENCY = 50
 
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
-CELERY_BROKER_URL = 'amqp://localhost'
+# CELERY_BROKER_URL = 'amqp://localhost'
 
 django_heroku.settings(locals())
-djcelery.setup_loader()
+# djcelery.setup_loader()
