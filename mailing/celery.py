@@ -10,7 +10,7 @@ app = Celery('mailing')
 app.config_from_object('django.conf:settings')
 
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
-app.conf.broker_url = settings.BROKER_URL
+app.conf.broker_url = os.environ.get('CLOUDAMQP_URL', 'amqp://guest:**@127.0.0.1:5672//')
 app.conf.timezone = 'Asia/Bishkek'
 
 app.conf.beat_schedule = {
