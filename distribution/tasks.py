@@ -38,16 +38,16 @@ def give_messages(distributions):
                 "phone": distribution_item.recipient.phone,
             }
             html_email_template_name = "distribution/message.html"
-
+            body = Template(distribution_item.distribution.body).render(Context(context))
             email_message = EmailMultiAlternatives(
                 subject=''.join(distribution_item.distribution.subject.splitlines()),
-                body=Template(distribution_item.distribution.body).render(Context(context)),
+                body=body,
                 from_email=settings.EMAIL_HOST_USER,
                 to=[distribution_item.recipient.email]
             )
             html_email = loader.render_to_string(
                 html_email_template_name,
-                Template(distribution_item.distribution.body).render(Context(context))
+                {"message": body}
             )
             email_message.attach_alternative(html_email, 'text/html')
             messages.append(email_message)
