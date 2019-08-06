@@ -1,2 +1,2 @@
 web: gunicorn mailing.wsgi
-main_worker: celery --app=celery.app worker --beat --loglevel=info
+main_worker: celery --app=mailing.celery worker --beat --loglevel=info
