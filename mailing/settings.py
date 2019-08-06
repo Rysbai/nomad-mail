@@ -145,7 +145,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-BROKER_URL = os.environ.get("CLOUDAMQP_URL", "django://")
+BROKER_URL = os.environ.get("CLOUDAMQP_URL", 'amqp://myuser:mypassword@localhost:5672/myvhost')
 BROKER_POOL_LIMIT = 1
 BROKER_CONNECTION_MAX_RETRIES = None
 BROKER_HEARTBEAT = None
@@ -156,7 +156,4 @@ WORKER_CONCURRENCY = 50
 
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
-# CELERY_BROKER_URL = 'amqp://localhost'
-
 django_heroku.settings(locals())
-# djcelery.setup_loader()
