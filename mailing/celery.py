@@ -7,11 +7,10 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mailing.settings')
 
 app = Celery('mailing')
-app.config_from_object('django.conf:settings')
+# app.config_from_object('django.conf:settings')
 
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
-app.conf.broker_url = 'amqp://otuzyhno:m8IstNKvaLlzZcoA2CS9EwXLKjtgBWtu@crocodile.rmq.cloudamqp.com/otuzyhno'
-print(app.conf.broker_url)
+app.conf.broker_url = settings.BROKER_URL
 app.conf.timezone = 'Asia/Bishkek'
 
 app.conf.beat_schedule = {
