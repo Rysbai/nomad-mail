@@ -161,4 +161,4 @@ CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 CELERY_BROKER_URL = 'amqp://localhost'
 
 django_heroku.settings(locals())
-# djcelery.setup_loader()
+djcelery.setup_loader()
