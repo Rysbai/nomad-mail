@@ -45,7 +45,10 @@ def give_messages(distributions):
                 from_email=settings.EMAIL_HOST_USER,
                 to=[distribution_item.recipient.email]
             )
-            html_email = loader.render_to_string(html_email_template_name, context)
+            html_email = loader.render_to_string(
+                html_email_template_name,
+                Template(distribution_item.distribution.body).render(Context(context))
+            )
             email_message.attach_alternative(html_email, 'text/html')
             messages.append(email_message)
 
