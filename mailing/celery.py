@@ -1,12 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 import django
 
-import datetime
 import os
 from celery import Celery
 from celery.schedules import crontab
 from django.conf import settings
-from django.core.mail import get_connection
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mailing.settings')
 django.setup()
@@ -19,25 +17,8 @@ app.conf.timezone = 'Asia/Bishkek'
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
-from distribution.models import Distribution
-from distribution.tasks import give_messages
-
-
-@app.task
-def check_time_to_distribution():
-
-    distributions = Distribution.objects.filter(is_sent=False, send_date__lte=datetime.datetime.now())
-    if distributions:
-        connection = get_connection(fail_silently=False)
-        connection.open()
-        messages = give_messages(distributions)
-
-        connection.send_messages(messages)
-        connection.close()
-
-
 app.conf.beat_schedule = {
-    'check-distributions-send-time-every-three-hours': {
+    'distribution.tasks.check-distributions-send-time-every-three-hours': {
         'task': 'check_time_to_distribution',
         'schedule': crontab(minute='*/30'),
     },
