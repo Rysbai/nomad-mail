@@ -5,6 +5,7 @@ import datetime
 import os
 from celery import Celery
 from celery.schedules import crontab
+from celery.task import periodic_task
 from django.conf import settings
 from django.core.mail import get_connection
 
@@ -24,6 +25,7 @@ from distribution.tasks import give_messages
 
 
 @app.task
+@periodic_task(run_every=crontab(minute=30))
 def check_time_to_distribution():
 
     distributions = Distribution.objects.filter(is_sent=False, send_date__lte=datetime.datetime.now())
@@ -36,9 +38,9 @@ def check_time_to_distribution():
         connection.close()
 
 
-app.conf.beat_schedule = {
-    'check-distributions-send-time-every-three-hours': {
-        'task': 'mailing.celery.check_time_to_distribution',
-        'schedule': crontab(minute='*/30'),
-    },
-}
+# app.conf.beat_schedule = {
+#     'checking_time_to_send_messages': {
+#         'task': 'distribution.tasks.check_time_to_distribution',
+#         'schedule': crontab(minute='*/30'),
+#     },
+# }

@@ -154,6 +154,8 @@ EVENT_QUEUE_EXPIRES = 60
 WORKER_PREFETCH_MULTIPLIER = 1
 WORKER_CONCURRENCY = 50
 
-CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
+
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
 django_heroku.settings(locals())
