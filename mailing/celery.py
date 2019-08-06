@@ -13,8 +13,6 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.broker_url = settings.BROKER_URL
 app.conf.timezone = 'Asia/Bishkek'
 
-print("IM HERE")
-
 app.conf.beat_schedule = {
     'check-distributions-send-time-every-three-hours': {
         'task': 'distribution.tasks.check_time_to_distribution',
