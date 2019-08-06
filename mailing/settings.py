@@ -155,9 +155,10 @@ RESULT_BACKEND = None
 EVENT_QUEUE_EXPIRES = 60
 WORKER_PREFETCH_MULTIPLIER = 1
 WORKER_CONCURRENCY = 50
-CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
-# CELERY_BROKER_URL = "amqp://guest:**@127.0.0.1:5672//"
 
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+CELERY_BROKER_URL = 'amqp://localhost'
 
 django_heroku.settings(locals())
 # djcelery.setup_loader()
