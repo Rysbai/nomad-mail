@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'event.apps.EventConfig',
     'ckeditor',
     'distribution.apps.DistributionConfig',
+    'djcelery'
 ]
 
 # CELERY
