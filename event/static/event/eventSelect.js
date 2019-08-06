@@ -1,7 +1,7 @@
 
 
 
-const API_URL = "http://127.0.0.1:8000/api";
+const API_URL = "https://nomad-mailing.herokuapp.com/api";
 function loadEvents(){
     console.log("weeffsfsasdasda");
     $.ajax({
