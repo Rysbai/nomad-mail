@@ -25,7 +25,7 @@ from distribution.tasks import give_messages
 
 
 @app.task
-@periodic_task(run_every=crontab())
+@periodic_task(run_every=crontab(minute=30))
 def check_time_to_distribution():
 
     distributions = Distribution.objects.filter(is_sent=False, send_date__lte=datetime.datetime.now())
