@@ -4,12 +4,16 @@ from event.models import Recipient
 
 
 class Distribution(models.Model):
-    name = models.CharField(max_length=100)
-    subject = models.CharField(max_length=200)
-    body = RichTextField()
-    send_date = models.DateTimeField()
-    is_sent = models.BooleanField(default=False)
-    rec_ids = models.CharField(max_length=30000)
+    name = models.CharField(max_length=100, verbose_name='Название')
+    subject = models.CharField(max_length=200, verbose_name='Тема')
+    body = RichTextField(verbose_name='Сообщение')
+    send_date = models.DateTimeField(verbose_name='Дата отправки')
+    is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
+    rec_ids = models.CharField(max_length=30000, verbose_name='Не трогайте это поле!')
+
+    class Meta:
+        verbose_name = 'Рассылка'
+        verbose_name_plural = 'Рассылки'
 
     def __str__(self):
         return self.name
@@ -30,9 +34,13 @@ class Distribution(models.Model):
 
 
 class DistributionItem(models.Model):
-    distribution = models.ForeignKey(Distribution, on_delete=models.CASCADE)
-    recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE)
-    is_sent = models.BooleanField(default=False)
+    distribution = models.ForeignKey(Distribution, on_delete=models.CASCADE, verbose_name='Рассылка')
+    recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name='Получатель')
+    is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
+
+    class Meta:
+        verbose_name = 'Сообщение'
+        verbose_name_plural = 'Сообщения'
 
     @staticmethod
     def create_mass_dis_items(distribution_id, recipient_ids):

@@ -19,11 +19,12 @@ class RecipientsInLine(admin.TabularInline):
 @register(Event)
 class EventAdmin(MaterialModelAdmin):
     list_display = ('name', )
+    icon_name = 'event_note'
 
 
 class EventListFilter(admin.SimpleListFilter):
-    title = _('event')
-    parameter_name = 'event'
+    title = _('Мероприятие')
+    parameter_name = 'Мероприятие'
 
     def lookups(self, request, model_admin):
         events = Event.objects.all()
@@ -37,8 +38,8 @@ class EventListFilter(admin.SimpleListFilter):
 
 
 class SexListFilter(admin.SimpleListFilter):
-    title = _('sex')
-    parameter_name = 'sex'
+    title = _('Пол')
+    parameter_name = 'Пол'
 
     def lookups(self, request, model_admin):
         return RECIPIENT_SEX_CHOICE
@@ -51,8 +52,8 @@ class SexListFilter(admin.SimpleListFilter):
 
 
 class CountryListFilter(admin.SimpleListFilter):
-    title = _('country')
-    parameter_name = 'country'
+    title = _('Страна')
+    parameter_name = 'Страна'
 
     def lookups(self, request, model_admin):
         countries = []

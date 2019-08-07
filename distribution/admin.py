@@ -25,8 +25,8 @@ class DistributionAdmin(MaterialModelAdmin):
 
 
 class EventListFilter(admin.SimpleListFilter):
-    title = _('distribution')
-    parameter_name = 'distribution'
+    title = _('Рассылка')
+    parameter_name = 'Рассылка'
 
     def lookups(self, request, model_admin):
         distribution = Distribution.objects.all()

@@ -4,8 +4,12 @@ from .parser import parse_xls
 
 
 class Event(models.Model):
-    name = models.CharField(max_length=200)
-    excel_file = models.FileField(upload_to="event/")
+    name = models.CharField(max_length=200, verbose_name='Имя')
+    excel_file = models.FileField(upload_to="event/", verbose_name='.XLS файл с участниками')
+
+    class Meta:
+        verbose_name = 'Мероприятие'
+        verbose_name_plural = 'Мероприятия'
 
     def save(self, *args, **kwargs):
         is_create = False
@@ -27,17 +31,21 @@ RECIPIENT_SEX_CHOICE = (
 
 
 class Recipient(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
-    surname = models.CharField(max_length=200)
-    birth_date = models.CharField(max_length=200)
-    sex = models.CharField(choices=RECIPIENT_SEX_CHOICE, max_length=50)
-    country = models.CharField(max_length=100)
-    phone = models.CharField(max_length=200)
-    email = models.EmailField(max_length=200)
-    distance = models.CharField(max_length=100)
-    register_date = models.CharField(max_length=100)
-    pay_status = models.CharField(max_length=100)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name='Мероприятие')
+    name = models.CharField(max_length=200, verbose_name='Имя')
+    surname = models.CharField(max_length=200, verbose_name='Фамилия')
+    birth_date = models.CharField(max_length=200, verbose_name='Дата рождения')
+    sex = models.CharField(choices=RECIPIENT_SEX_CHOICE, max_length=50, verbose_name='Пол')
+    country = models.CharField(max_length=100, verbose_name='Страна')
+    phone = models.CharField(max_length=200, verbose_name='Телефон')
+    email = models.EmailField(max_length=200, verbose_name='Email')
+    distance = models.CharField(max_length=100, verbose_name='Дистанция')
+    register_date = models.CharField(max_length=100, verbose_name='Дата регистрации')
+    pay_status = models.CharField(max_length=100, verbose_name='Статус оплаты')
+
+    class Meta:
+        verbose_name = 'Участник'
+        verbose_name_plural = 'Участники'
 
     @staticmethod
     def create_mass_recipients(event_id, args):
