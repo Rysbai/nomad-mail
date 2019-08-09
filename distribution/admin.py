@@ -47,5 +47,5 @@ class DistributionItemAdmin(MaterialModelAdmin):
     icon_name = 'playlist_add_check'
 
 
-site.site_header = _("Nomad рассылка")
-site.site_title = _("Nomad рассылка")
+site.site_header = _("Nomad Sport Mail")
+site.site_title = _("Nomad Sport Mail")
