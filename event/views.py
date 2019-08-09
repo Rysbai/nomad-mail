@@ -12,7 +12,7 @@ def get_events(request):
                 'id': event.id,
                 'name': event.name
             })
-
+    print(data)
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -27,7 +27,7 @@ def get_all_participants_country(request):
             countries.append({
                 "name": recipient.country
             })
-
+    print(countries)
     return HttpResponse(json.dumps(countries), content_type='application/json')
 
 
@@ -84,7 +84,7 @@ def get_recipients_by_ids(request):
     event_id = None
     recipients = []
     countries = []
-    sex = []
+    sex = ''
     for recipient in queryset:
         recipients.append(
             {
@@ -101,8 +101,10 @@ def get_recipients_by_ids(request):
         if recipient.country not in countries:
             countries.append(recipient.country)
 
-        if recipient.sex not in sex:
-            sex.append(recipient.sex)
+        if not sex:
+            sex = recipient.sex
+        elif len(sex) == 1 and recipient.sex != sex:
+            sex = 'М,Ж'
 
     data = {
         "event_id": event_id,

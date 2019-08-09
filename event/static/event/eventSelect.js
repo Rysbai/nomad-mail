@@ -1,7 +1,9 @@
 
 
+const localAPI = "http://127.0.0.1:8000/api";
+const herokuAPI = "https://nomad-mailing.herokuapp.com/api";
 
-const API_URL = "https://nomad-mailing.herokuapp.com/api";
+const API_URL = herokuAPI;
 function loadEvents(recEventId){
     $.ajax({
         type: "GET",
@@ -12,7 +14,6 @@ function loadEvents(recEventId){
             let i;
             for (i=0; i<data.length; i++){
                 if (recEventId === data[i].id) {
-                    console.log("fwfefewfefewfwefwefwefe");
                     $("#eventSelect").append($('<option>', {value: data[i].id, text: data[i].name, selected: true}))
                 } else {
                     $("#eventSelect").append($('<option>', {value: data[i].id, text: data[i].name}))
@@ -77,8 +78,7 @@ function getRecipients() {
 
 $("#filter-recipients").click( function(){
     getRecipients()
-}
-);
+});
 
 const willGetRecipientsByIds = () => new Promise(
     function (resolve, reject) {
@@ -118,7 +118,7 @@ function loadPage() {
     if ($('#id_rec_ids').val()){
         willGetRecipientsByIds().then(res=> {
             console.log(res.countries);
-            $(`#sexSelect option[value=${res.sex}]`).prop('selected', true);
+            $(`#sexSelect option[value="${res.sex}"]`).prop('selected', true);
             loadEvents(res.eventId);
             loadCountries(res.countries);
         })
