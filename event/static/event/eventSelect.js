@@ -33,7 +33,7 @@ function loadCountries(recCountries){
             console.log(recCountries);
             let i;
             for (i=0; i<data.length; i++){
-                if (data[i].name in recCountries) {
+                if (recCountries && data[i].name in recCountries) {
                     $("#countrySelect").append($('<option>', {value: data[i].name, text: data[i].name, selected: true}))
                 } else {
                     $("#countrySelect").append($('<option>', {value: data[i].name, text: data[i].name}))
