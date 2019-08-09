@@ -1,11 +1,11 @@
 import json
-from django.shortcuts import render
+
 from django.http import HttpResponse
 from event.models import Event, Recipient
 
 
 def get_events(request):
-    queryset = Event.objects.all()
+    queryset = Event.objects.all().order_by('-id')
     data = []
     for event in queryset.all():
         data.append({
@@ -74,4 +74,40 @@ def get_recipients(request):
             }
         )
 
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def get_recipients_by_ids(request):
+    ids = request.GET.get("rec_ids", None).split(',')[:-1]
+    queryset = Recipient.objects.filter(id__in=ids)
+
+    event_id = None
+    recipients = []
+    countries = []
+    sex = []
+    for recipient in queryset:
+        recipients.append(
+            {
+                "id": recipient.id,
+                "name": recipient.name,
+                "surname": recipient.surname,
+                "distance": recipient.distance,
+                "country": recipient.country,
+                "sex": recipient.sex,
+                "email": recipient.email
+            }
+        )
+        event_id = recipient.event_id
+        if recipient.country not in countries:
+            countries.append(recipient.country)
+
+        if recipient.sex not in sex:
+            sex.append(recipient.sex)
+
+    data = {
+        "event_id": event_id,
+        "countries": countries,
+        "sex": sex,
+        "recipients": recipients
+    }
     return HttpResponse(json.dumps(data), content_type='application/json')

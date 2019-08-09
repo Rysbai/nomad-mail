@@ -64,22 +64,32 @@
 {% endblock %}
 
 {% block after_related_objects %}
+    <style type="text/css">
+        .django-ckeditor-widget {
+            margin-top: 45px;
+        }
+    </style>
     <div class="container" >
         <h4>Выбор получателей</h4>
-    <!--<label for="eventSelect" class="required active"> Событие</label>-->
-    <select id="eventSelect">
-    </select>
+    <label for="eventSelect" class="required active">Событие</label>
 
-    <!--<label for="sexSelect" class="required active"> Пол</label>-->
-    <select id="sexSelect">
+    <select id="eventSelect" class="browser-default custom-select">
+    </select>
+        <br/>
+
+    <label for="sexSelect" class="required active"> Пол</label>
+    <select id="sexSelect" class="browser-default custom-select">
         <option value="М,Ж">Все</option>
         <option value="М">M</option>
         <option value="Ж">Ж</option>
     </select>
+        <br/>
+    <label for="countrySelect" class="required active">Страны </label>
 
-    <!--<label for="countrySelect" class="required active">Страны</label>-->
-    <select id="countrySelect" multiple aria-label="Выберите страну">
+    <select id="countrySelect" multiple aria-label="Выберите страну" class="browser-default custom-select">
     </select>
+        <p>*для множенственного выбора удерживайте CTRL и выбирайте. Можно не выбрать, если хотите отправить всем.</p>
+        <br/>
         <button id="filter-recipients" class="default waves-effect waves-light btn" type="button">Выбрать</button>
 
     </div>
@@ -88,12 +98,12 @@
         <table id="recipientTable" class="table table-bordered table-striped mb-0">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Surname</th>
-                    <th>Distance</th>
-                    <th>Country</th>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
+                    <th>Дистанция</th>
+                    <th>Страна</th>
                     <th>Email</th>
-                    <th>Sex</th>
+                    <th>Пол</th>
                 </tr>
             </thead>
             <tbody id="recipientTableBody">

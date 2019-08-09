@@ -1,9 +1,8 @@
 
 
 
-const API_URL = "https://nomad-mailing.herokuapp.com/api";
-function loadEvents(){
-    console.log("weeffsfsasdasda");
+const API_URL = "http://127.0.0.1:8000/api";
+function loadEvents(recEventId){
     $.ajax({
         type: "GET",
         url: API_URL + "/event/get_all",
@@ -11,30 +10,36 @@ function loadEvents(){
         success: function (data) {
             console.log(data);
             let i;
-            let options = [];
             for (i=0; i<data.length; i++){
-                options.push(`<option value="${ data[i].id }"> ${ data[i].name } </option>`)
+                if (recEventId === data[i].id) {
+                    console.log("fwfefewfefewfwefwefwefe");
+                    $("#eventSelect").append($('<option>', {value: data[i].id, text: data[i].name, selected: true}))
+                } else {
+                    $("#eventSelect").append($('<option>', {value: data[i].id, text: data[i].name}))
+                }
             }
-            $("#eventSelect").html(options)
-
         }
 
     });
 }
 
-function loadCountries(){
-    console.log("weeffsfsasdasda");
+function loadCountries(recCountries){
     $.ajax({
         type: "GET",
         url: API_URL + "/event/get_all_participants_country",
         dataType: "json",
         success: function (data) {
+            console.log(recCountries);
             let i;
-            let options = [];
             for (i=0; i<data.length; i++){
-                options.push(`<option label="${ data[i].name }">${ data[i].name }</option>`)
+                if (data[i].name in recCountries) {
+                    $("#countrySelect").append($('<option>', {value: data[i].name, text: data[i].name, selected: true}))
+                } else {
+                    $("#countrySelect").append($('<option>', {value: data[i].name, text: data[i].name}))
+                }
+
             }
-            $("#countrySelect").html(options)
+
         }
     });
 }
@@ -43,6 +48,7 @@ function getRecipients() {
     const event_id = $("#eventSelect").val();
     const sex = $("#sexSelect").val();
     const countries = $("#countrySelect").val();
+    console.log(event_id, sex, countries);
     $.ajax({
         type: "GET",
         url: API_URL + `/event/get_recipients?event_id=${event_id}&sex=${sex}&countries=${countries}`,
@@ -74,6 +80,52 @@ $("#filter-recipients").click( function(){
 }
 );
 
-loadEvents();
-loadCountries();
+const willGetRecipientsByIds = () => new Promise(
+    function (resolve, reject) {
+        const rec_ids = $('#id_rec_ids').val()
+        $.ajax({
+            type: "GET",
+            url: API_URL + `/event/get_recipients_by_ids?rec_ids=${rec_ids}`,
+            dataType: "json",
+            success: function (data) {
+                let i;
+                let rec_ids = '';
+                let tableBodyItem = [];
+                for (i=0; i< data.recipients.length; i++){
+                    rec_ids += data.recipients[i].id + ',';
 
+                    tableBodyItem.push(`<tr>
+                                        <td>${data.recipients[i].name}</td>
+                                        <td>${data.recipients[i].surname}</td>
+                                        <td>${data.recipients[i].distance}</td>
+                                        <td>${data.recipients[i].country}</td>
+                                        <td>${data.recipients[i].email}</td>
+                                        <td>${data.recipients[i].sex}</td>
+                                    </tr>`)
+                }
+                $("#recipientTableBody").html(tableBodyItem);
+                resolve({
+                    eventId: data.event_id,
+                    countries: data.countries,
+                    sex: data.sex
+                })
+            }
+        })
+    }
+);
+
+function loadPage() {
+    if ($('#id_rec_ids').val()){
+        willGetRecipientsByIds().then(res=> {
+            console.log(res.countries);
+            $(`#sexSelect option[value=${res.sex}]`).prop('selected', true);
+            loadEvents(res.eventId);
+            loadCountries(res.countries);
+        })
+    } else {
+        loadEvents();
+        loadCountries();
+    }
+}
+
+loadPage();

@@ -27,7 +27,7 @@ class EventListFilter(admin.SimpleListFilter):
     parameter_name = 'Мероприятие'
 
     def lookups(self, request, model_admin):
-        events = Event.objects.all()
+        events = Event.objects.all().order_by('-id')
         return tuple([(event.id, event.name) for event in events])
 
     def queryset(self, request, queryset):
