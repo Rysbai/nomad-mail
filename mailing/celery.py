@@ -12,10 +12,10 @@ from django.core.mail import get_connection
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mailing.settings')
 django.setup()
 
-app = Celery('mailing')
+app = Celery('mailing', backend='amqp', broker='amqp://')
 app.config_from_object('django.conf:settings')
 
-app.conf.broker_url = settings.BROKER_URL
+# app.conf.broker_url = settings.BROKER_URL
 app.conf.timezone = 'Asia/Bishkek'
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
