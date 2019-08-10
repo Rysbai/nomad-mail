@@ -2,8 +2,9 @@
 
 const localAPI = "http://127.0.0.1:8000/api";
 const herokuAPI = "https://nomad-mailing.herokuapp.com/api";
+const doAPI = "http://167.71.86.184/api";
 
-const API_URL = herokuAPI;
+const API_URL = doAPI;
 function loadEvents(recEventId){
     $.ajax({
         type: "GET",
