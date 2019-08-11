@@ -9,7 +9,7 @@ class Distribution(models.Model):
     body = RichTextField(verbose_name='Сообщение')
     send_date = models.DateTimeField(verbose_name='Дата отправки')
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
-    rec_ids = models.CharField(max_length=30000, verbose_name='Не трогайте!')
+    rec_ids = models.TextField(verbose_name='Не трогайте!')
 
     class Meta:
         verbose_name = 'Рассылка'
