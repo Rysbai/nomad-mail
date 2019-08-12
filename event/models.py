@@ -11,6 +11,10 @@ class Event(models.Model):
         verbose_name = 'Мероприятие'
         verbose_name_plural = 'Мероприятия'
 
+    def __init__(self, *args, **kwargs):
+        super(Event, self).__init__(*args, **kwargs)
+        self._past_excel_file = self.excel_file
+
     def save(self, *args, **kwargs):
         is_create = False
         if self._state.adding:
@@ -19,6 +23,10 @@ class Event(models.Model):
         super().save(*args, **kwargs)
         if is_create:
             Recipient.create_mass_recipients(self.id, parse_xls(self.excel_file.path))
+        elif self.excel_file != self._past_excel_file:
+            Recipient.delete_recipients_by_event_id(self.id)
+            Recipient.create_mass_recipients(self.id, parse_xls(self.excel_file.path))
+            self._past_excel_file = self.excel_file
 
     def __str__(self):
         return self.name

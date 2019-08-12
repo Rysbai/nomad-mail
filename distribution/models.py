@@ -15,6 +15,10 @@ class Distribution(models.Model):
         verbose_name = 'Рассылка'
         verbose_name_plural = 'Рассылки'
 
+    def __init__(self, *args, **kwargs):
+        super(Distribution, self).__init__(*args, **kwargs)
+        self._past_rec_ids = self.rec_ids
+
     def __str__(self):
         return self.name
 
@@ -26,6 +30,10 @@ class Distribution(models.Model):
 
         if is_create:
             DistributionItem.create_mass_dis_items(self.id, self.rec_ids.split(','))
+        elif self.rec_ids != self._past_rec_ids:
+            self.delete_all_items()
+            DistributionItem.create_mass_dis_items(self.id, self.rec_ids.split(','))
+            self._past_rec_ids = self.rec_ids
 
     def delete_all_items(self):
         distribution_items = self.distributionitem_set.all()
