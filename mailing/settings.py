@@ -120,8 +120,8 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
 
 BROKER_URL = os.environ.get("CLOUDAMQP_URL", 'amqp://myuser:mypassword@localhost:5672/myvhost')
 BROKER_POOL_LIMIT = 1
