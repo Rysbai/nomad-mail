@@ -50,7 +50,6 @@ function getRecipients() {
     const event_id = $("#eventSelect").val();
     const sex = $("#sexSelect").val();
     const countries = $("#countrySelect").val();
-    console.log(event_id, sex, countries);
     $.ajax({
         type: "GET",
         url: API_URL + `/event/get_recipients?event_id=${event_id}&sex=${sex}&countries=${countries}`,
@@ -72,6 +71,7 @@ function getRecipients() {
                                 </tr>`)
             }
             $('#id_rec_ids').val(rec_ids);
+            $("#rec_counts").html(data.length);
             $("#recipientTableBody").html(tableBodyItem)
         }
     })
@@ -104,6 +104,7 @@ const willGetRecipientsByIds = () => new Promise(
                                         <td>${data.recipients[i].sex}</td>
                                     </tr>`)
                 }
+                $("#rec_counts").html(data.recipients.length);
                 $("#recipientTableBody").html(tableBodyItem);
                 resolve({
                     eventId: data.event_id,
