@@ -70,7 +70,7 @@ function getRecipients() {
                                     <td>${data[i].sex}</td>
                                 </tr>`)
             }
-            $('#id_rec_ids').val(rec_ids);
+            $('#id_rec_ids').val("Количество получателей: " + rec_ids);
             $("#rec_counts").html(data.length);
             $("#recipientTableBody").html(tableBodyItem)
         }
@@ -104,7 +104,7 @@ const willGetRecipientsByIds = () => new Promise(
                                         <td>${data.recipients[i].sex}</td>
                                     </tr>`)
                 }
-                $("#rec_counts").html(data.recipients.length);
+                $("#rec_counts").html("Количество получателей: " + data.recipients.length);
                 $("#recipientTableBody").html(tableBodyItem);
                 resolve({
                     eventId: data.event_id,
