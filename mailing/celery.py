@@ -40,7 +40,7 @@ def get_context(item):
 
 def put_absolute_urls(text):
     pattern = r'<img[^>]+src="(/[^">]+)"'
-    host = 'http://snowleopardrun.com'
+    host = 'https://snowleopardrun.com'
     for src in re.findall(pattern, text):
         text = re.sub(src, host+src, text, count=1)
 
