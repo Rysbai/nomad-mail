@@ -7,7 +7,7 @@ from django.template import loader, Template, Context
 from mailing import settings
 
 from mailing.celery import app
-from distribution.models import DistributionItem, Distribution
+from distribution.models import Distribution
 
 
 @app.task
@@ -27,7 +27,6 @@ def give_messages(distributions):
     messages = []
     for distribution in distributions:
         for distribution_item in distribution.distributionitem_set.all():
-            distribution_item = DistributionItem.objects.get(id=distribution_item.id)
             context = {
                 "name": distribution_item.recipient.name,
                 "surname": distribution_item.recipient.surname,

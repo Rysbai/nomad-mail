@@ -1,12 +1,12 @@
 from django.db import models
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from event.models import Recipient
 
 
 class Distribution(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название')
     subject = models.CharField(max_length=200, verbose_name='Тема')
-    body = RichTextField(verbose_name='Сообщение')
+    body = RichTextUploadingField(verbose_name='Сообщение')
     send_date = models.DateTimeField(verbose_name='Дата отправки')
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
     rec_ids = models.TextField(verbose_name='Не трогайте!')

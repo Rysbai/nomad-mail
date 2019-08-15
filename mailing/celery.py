@@ -1,13 +1,15 @@
 from __future__ import absolute_import, unicode_literals
 import django
 
+import re
 import datetime
 import os
 from celery import Celery
 from celery.schedules import crontab
 from celery.task import periodic_task
 from django.conf import settings
-from django.core.mail import get_connection
+from django.core.mail import get_connection, EmailMultiAlternatives
+from django.template import Template, loader, Context
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mailing.settings')
 django.setup()
@@ -15,32 +17,110 @@ django.setup()
 app = Celery('mailing', backend='amqp', broker='amqp://')
 app.config_from_object('django.conf:settings')
 
-# app.conf.broker_url = settings.BROKER_URL
 app.conf.timezone = 'Asia/Bishkek'
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
-from distribution.models import Distribution
-from distribution.tasks import give_messages
+from distribution.models import DistributionItem, Distribution
+
+DAY_LIMIT = 3000
+today_sent = 0
+
+
+def get_context(item):
+    return Context({
+        "name": item.recipient.name,
+        "surname": item.recipient.surname,
+        "email": item.recipient.email,
+        "distance": item.recipient.distance,
+        "sex": item.recipient.sex,
+        "country": item.recipient.country,
+        "phone": item.recipient.phone,
+    })
+
+
+def put_absolute_urls(text):
+    pattern = r'<img[^>]+src="(/[^">]+)"'
+    host = 'http://snowleopardrun.com/'
+    for src in re.findall(pattern, text):
+        text = re.sub(src, host+src, text, count=1)
+
+    return text
+
+
+def get_messages():
+    global today_sent
+    html_email_template_name = "distribution/message.html"
+    distribution_items = DistributionItem.objects.filter(
+        distribution__is_sent=False,
+        distribution__send_date__lte=datetime.datetime.now()
+    )
+    index = 0
+    messages = []
+    while today_sent < DAY_LIMIT - 1 or index <= len(distribution_items):
+        item = distribution_items[index]
+
+        context = get_context(item)
+        body = Template(
+            put_absolute_urls(item.distribution.body)
+        ).render(context)
+
+        email_message = EmailMultiAlternatives(
+            subject=''.join(item.distribution.subject.splitlines()),
+            body=body,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[item.recipient.email]
+        )
+        html_email = loader.render_to_string(
+            html_email_template_name,
+            {"message": body}
+        )
+        email_message.attach_alternative(html_email, 'text/html')
+        messages.append(email_message)
+
+        item.is_sent = True
+        item.save()
+        today_sent += 1
+        index += 1
+
+    return messages
+
+
+def close_sent_distributions():
+    distributions = Distribution.objects.filter(is_sent=False, send_date__lte=datetime.datetime.now())
+    for distribution in distributions:
+        items = DistributionItem.objects.filter(distribution=distribution, is_sent=False)
+        if not items:
+            distribution.is_sent = True
+            distribution.save()
 
 
 @app.task
 @periodic_task(run_every=crontab(minute=30))
 def check_time_to_distribution():
+    if today_sent < DAY_LIMIT - 1:
+        messages = get_messages()
 
-    distributions = Distribution.objects.filter(is_sent=False, send_date__lte=datetime.datetime.now())
-    if distributions:
+        if messages:
+            connection = get_connection(fail_silently=False)
+            connection.open()
+            connection.send_messages(messages)
+            connection.close()
+
+        close_sent_distributions()
+
+
+@app.task
+@periodic_task(run_every=crontab(minute=0, hour=0))
+def send_didnt_send_distributions():
+    global today_sent
+    today_sent = 0
+
+    messages = get_messages()
+    if messages:
         connection = get_connection(fail_silently=False)
         connection.open()
-        messages = give_messages(distributions)
-
         connection.send_messages(messages)
         connection.close()
 
-
-# app.conf.beat_schedule = {
-#     'checking_time_to_send_messages': {
-#         'task': 'distribution.tasks.check_time_to_distribution',
-#         'schedule': crontab(minute='*/30'),
-#     },
-# }
+    close_sent_distributions()
