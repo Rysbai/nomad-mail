@@ -21,10 +21,9 @@ app.conf.timezone = 'Asia/Bishkek'
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
-from distribution.models import DistributionItem, Distribution
+from distribution.models import DistributionItem, Distribution, Counter
 
 DAY_LIMIT = 3000
-today_sent = 0
 
 
 def get_context(item):
@@ -41,7 +40,7 @@ def get_context(item):
 
 def put_absolute_urls(text):
     pattern = r'<img[^>]+src="(/[^">]+)"'
-    host = 'http://snowleopardrun.com/'
+    host = 'http://snowleopardrun.com'
     for src in re.findall(pattern, text):
         text = re.sub(src, host+src, text, count=1)
 
@@ -49,15 +48,16 @@ def put_absolute_urls(text):
 
 
 def get_messages():
-    global today_sent
+    counter = Counter.objects.get(name='mail')
     html_email_template_name = "distribution/message.html"
     distribution_items = DistributionItem.objects.filter(
         distribution__is_sent=False,
-        distribution__send_date__lte=datetime.datetime.now()
+        distribution__send_date__lte=datetime.datetime.now(),
+        is_sent=False
     )
     index = 0
     messages = []
-    while today_sent < DAY_LIMIT - 1 or index <= len(distribution_items):
+    while index < len(distribution_items) and counter.count < DAY_LIMIT - 1:
         item = distribution_items[index]
 
         context = get_context(item)
@@ -80,7 +80,8 @@ def get_messages():
 
         item.is_sent = True
         item.save()
-        today_sent += 1
+        counter.count += 1
+        counter.save()
         index += 1
 
     return messages
@@ -98,23 +99,23 @@ def close_sent_distributions():
 @app.task
 @periodic_task(run_every=crontab(minute=30))
 def check_time_to_distribution():
-    if today_sent < DAY_LIMIT - 1:
-        messages = get_messages()
+    messages = get_messages()
 
-        if messages:
-            connection = get_connection(fail_silently=False)
-            connection.open()
-            connection.send_messages(messages)
-            connection.close()
+    if messages:
+        connection = get_connection(fail_silently=False)
+        connection.open()
+        connection.send_messages(messages)
+        connection.close()
 
-        close_sent_distributions()
+    close_sent_distributions()
 
 
 @app.task
 @periodic_task(run_every=crontab(minute=0, hour=0))
 def send_didnt_send_distributions():
-    global today_sent
-    today_sent = 0
+    counter = Counter.objects.get(name='mail')
+    counter.count = 0
+    counter.save()
 
     messages = get_messages()
     if messages:

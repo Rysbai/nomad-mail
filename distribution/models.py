@@ -64,3 +64,8 @@ class DistributionItem(models.Model):
 
     def __str__(self):
         return self.recipient.email
+
+
+class Counter(models.Model):
+    name = models.CharField(max_length=200)
+    count = models.PositiveIntegerField(default=0)

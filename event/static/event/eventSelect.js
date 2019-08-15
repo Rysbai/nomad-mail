@@ -4,7 +4,7 @@ const localAPI = "http://127.0.0.1:8000/api";
 const herokuAPI = "https://nomad-mailing.herokuapp.com/api";
 const doAPI = "http://167.71.86.184/api";
 
-const API_URL = doAPI;
+const API_URL = localAPI;
 function loadEvents(recEventId){
     $.ajax({
         type: "GET",
@@ -70,8 +70,8 @@ function getRecipients() {
                                     <td>${data[i].sex}</td>
                                 </tr>`)
             }
-            $('#id_rec_ids').val("Количество получателей: " + rec_ids);
-            $("#rec_counts").html(data.length);
+            $('#id_rec_ids').val(rec_ids);
+            $("#rec_counts").html("Количество получателей: " + data.length);
             $("#recipientTableBody").html(tableBodyItem)
         }
     })
