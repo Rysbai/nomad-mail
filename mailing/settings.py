@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'event.apps.EventConfig',
+    'ckeditor_uploader',
     'ckeditor',
     'distribution.apps.DistributionConfig',
     'djcelery'
