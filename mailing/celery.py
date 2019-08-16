@@ -4,6 +4,7 @@ import django
 import re
 import datetime
 import os
+import shutil
 from celery import Celery
 from celery.schedules import crontab
 from celery.task import periodic_task
@@ -24,6 +25,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 from distribution.models import DistributionItem, Distribution, Counter
 
 DAY_LIMIT = 3000
+MONTH_FOR_DELETE_IMAGES = 6
 
 
 def get_context(item):
@@ -125,3 +127,16 @@ def send_didnt_send_distributions():
         connection.close()
 
     close_sent_distributions()
+
+
+@app.task
+@periodic_task(run_every=crontab(day_of_month="1", hour=7, minute=30))
+def delete_older_then_4_month_ckeditor_images():
+    time = datetime.datetime.now() - datetime.timedelta(days=MONTH_FOR_DELETE_IMAGES * 31)
+    year = str(time.year)
+    month = str(time.month) if time.month >= 10 else "0" + str(time.month)
+    directory = settings.MEDIA_ROOT + settings.CKEDITOR_UPLOAD_PATH + year + "/" + month
+    try:
+        shutil.rmtree(directory)
+    except FileNotFoundError:
+        pass

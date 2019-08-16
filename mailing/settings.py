@@ -112,7 +112,8 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
-
+CKEDITOR_RESTRICT_BY_DATE = True
+MAX_UPLOAD_SIZE = "524288"
 
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT')
