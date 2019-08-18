@@ -1,6 +1,12 @@
+import ast
+
 from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
-from event.models import Recipient
+from event.models import Recipient, Event
+
+
+def filter_recipients(event, sex, countries):
+    return Recipient.objects.filter(event_id=event.id, sex__in=sex, country__in=countries)
 
 
 class Distribution(models.Model):
@@ -9,7 +15,9 @@ class Distribution(models.Model):
     body = RichTextUploadingField(verbose_name='Сообщение')
     send_date = models.DateTimeField(verbose_name='Дата отправки')
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
-    rec_ids = models.TextField(verbose_name='Не трогайте!')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name='Мероприятие')
+    sex = models.CharField(max_length=20, verbose_name='Пол')
+    country = models.CharField(max_length=400, verbose_name='Страны')
 
     class Meta:
         verbose_name = 'Рассылка'
@@ -17,7 +25,9 @@ class Distribution(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Distribution, self).__init__(*args, **kwargs)
-        self._past_rec_ids = self.rec_ids
+        self._current_event_id = self.event_id
+        self._current_sex = self.sex
+        self._current_countries = self.country
 
     def __str__(self):
         return self.name
@@ -28,12 +38,19 @@ class Distribution(models.Model):
             is_create = True
         super().save(*args, **kwargs)
 
-        if is_create:
-            DistributionItem.create_mass_dis_items(self.id, self.rec_ids.split(','))
-        elif self.rec_ids != self._past_rec_ids:
+        if is_create \
+                or self.event_id != self._current_event_id \
+                or self.sex != self._current_sex \
+                or self.country != self._current_countries:
+
+            self._current_event_id = self.event_id
+            self._current_sex = self.sex
+            self._current_countries = self.country
+
+            country_list = ast.literal_eval(self.country)
             self.delete_all_items()
-            DistributionItem.create_mass_dis_items(self.id, self.rec_ids.split(','))
-            self._past_rec_ids = self.rec_ids
+            for recipient in filter_recipients(self.event, self.sex, country_list):
+                DistributionItem.objects.create(distribution_id=self.id, recipient=recipient).save()
 
     def delete_all_items(self):
         distribution_items = self.distributionitem_set.all()
@@ -53,7 +70,6 @@ class DistributionItem(models.Model):
     @staticmethod
     def create_mass_dis_items(distribution_id, recipient_ids):
         for rec_id in recipient_ids[:-1]:
-            print(rec_id)
             try:
                 DistributionItem.objects.create(
                     distribution_id=distribution_id,
