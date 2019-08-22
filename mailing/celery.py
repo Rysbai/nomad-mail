@@ -83,9 +83,9 @@ def get_messages():
         item.is_sent = True
         item.save()
         counter.count += 1
-        counter.save()
         index += 1
 
+    counter.save()
     return messages
 
 
