@@ -5,7 +5,7 @@ from .parser import parse_xls
 
 class Event(models.Model):
     name = models.CharField(max_length=200, verbose_name='Имя')
-    excel_file = models.FileField(upload_to="event/", verbose_name='.XLS файл с участниками')
+    excel_file = models.FileField(upload_to="event/", verbose_name='Excel с участниками')
 
     class Meta:
         verbose_name = 'Мероприятие'
