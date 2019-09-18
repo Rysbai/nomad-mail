@@ -1,9 +1,6 @@
 from django.contrib import admin
 
 from distribution.forms import DistributionCreateForm
-from material.admin.options import MaterialModelAdmin
-from material.admin.decorators import register
-from material.admin.sites import site
 from django.utils.translation import gettext_lazy as _
 
 from distribution.models import Distribution, DistributionItem
@@ -18,11 +15,9 @@ class DistributionItemInLine(admin.StackedInline):
     can_delete = False
 
 
-@register(Distribution)
-class DistributionAdmin(MaterialModelAdmin):
+class DistributionAdmin(admin.ModelAdmin):
     list_display = ('name', 'send_date', 'is_sent')
     form = DistributionCreateForm
-    icon_name = 'mail'
 
 
 class DistributionListFilter(admin.SimpleListFilter):
@@ -40,12 +35,10 @@ class DistributionListFilter(admin.SimpleListFilter):
         return queryset.filter(distribution_id=self.value())
 
 
-@register(DistributionItem)
-class DistributionItemAdmin(MaterialModelAdmin):
+class DistributionItemAdmin(admin.ModelAdmin):
     list_display = ('recipient', 'is_sent')
     list_filter = (DistributionListFilter, 'is_sent')
-    icon_name = 'playlist_add_check'
 
 
-site.site_header = _("Nomad Sport Mail")
-site.site_title = _("Nomad Sport Mail")
+admin.site.site_header = _("Nomad Sport Mail")
+admin.site.site_title = _("Nomad Sport Mail")

@@ -2,10 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.utils.translation import gettext_lazy as _
 
-from material.admin.options import MaterialModelAdmin
-from material.admin.decorators import register
-from material.admin.sites import site
-
 from event.models import Event, Recipient, RECIPIENT_SEX_CHOICE
 
 
@@ -16,10 +12,8 @@ class RecipientsInLine(admin.TabularInline):
     extra = 1
 
 
-@register(Event)
-class EventAdmin(MaterialModelAdmin):
+class EventAdmin(admin.ModelAdmin):
     list_display = ('name', )
-    icon_name = 'event_note'
 
 
 class EventListFilter(admin.SimpleListFilter):
@@ -74,14 +68,12 @@ class CountryListFilter(admin.SimpleListFilter):
         return queryset.filter(country=self.value())
 
 
-@register(Recipient)
-class RecipientAdmin(MaterialModelAdmin):
-    icon_name = "person"
+class RecipientAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname', 'birth_date', 'country', 'phone', 'email')
 
     search_fields = ('name', 'surname')
     list_filter = (EventListFilter, SexListFilter, CountryListFilter)
 
 
-site.unregister(Group)
-site.unregister(User)
+admin.site.unregister(Group)
+admin.site.unregister(User)
