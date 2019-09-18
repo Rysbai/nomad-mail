@@ -1,6 +1,7 @@
 .venv/*
 .idea/*
 media/
+static/
 
 ### OSX ###
 .DS_Store
