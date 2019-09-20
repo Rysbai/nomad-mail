@@ -38,6 +38,20 @@ RECIPIENT_SEX_CHOICE = (
 )
 
 
+def get_countries_choices():
+    countries = []
+    country_list = []
+    recipients = Recipient.objects.all()
+
+    for recipient in recipients:
+        if recipient.country not in country_list:
+            country_list.append(recipient.country)
+            countries.append((recipient.country, recipient.country))
+
+    return tuple(countries)
+    # return tuple()
+
+
 class Recipient(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name='Мероприятие')
     name = models.CharField(max_length=200, verbose_name='Имя')

@@ -17,7 +17,14 @@ class DistributionItemInLine(admin.StackedInline):
 
 class DistributionAdmin(admin.ModelAdmin):
     list_display = ('name', 'send_date', 'is_sent')
-    form = DistributionCreateForm
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'subject', 'body', 'send_date')
+        }),
+        ("Выбор получателей", {
+            'fields': ('for_event', 'to_sex', 'to_countries')
+        })
+    )
 
 
 class DistributionListFilter(admin.SimpleListFilter):
@@ -40,5 +47,7 @@ class DistributionItemAdmin(admin.ModelAdmin):
     list_filter = (DistributionListFilter, 'is_sent')
 
 
+admin.site.register(Distribution, DistributionAdmin)
+admin.site.register(DistributionItem, DistributionItemAdmin)
 admin.site.site_header = _("Nomad Sport Mail")
 admin.site.site_title = _("Nomad Sport Mail")

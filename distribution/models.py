@@ -1,6 +1,8 @@
 from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
-from event.models import Recipient
+from multiselectfield import MultiSelectField
+
+from event.models import Recipient, RECIPIENT_SEX_CHOICE, Event, get_countries_choices
 
 
 class Distribution(models.Model):
@@ -9,7 +11,10 @@ class Distribution(models.Model):
     body = RichTextUploadingField(verbose_name='Сообщение')
     send_date = models.DateTimeField(verbose_name='Дата отправки')
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
-    rec_ids = models.TextField(verbose_name='Не трогайте!')
+
+    to_sex = MultiSelectField(choices=RECIPIENT_SEX_CHOICE, verbose_name='Пол')
+    to_countries = MultiSelectField(choices=get_countries_choices(), verbose_name='Страны')
+    for_event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name='Мероприятие')
 
     class Meta:
         verbose_name = 'Рассылка'
@@ -17,50 +22,52 @@ class Distribution(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Distribution, self).__init__(*args, **kwargs)
-        self._past_rec_ids = self.rec_ids
+        self.current_to_sex = self.to_sex
+        self.current_to_countries = self.to_countries
+        # self.current_for_event = self.for_event
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
         is_create = False
-        if self._state.adding:
+        if self._state.adding \
+            or self.current_to_sex != self.to_sex \
+            or self.current_to_countries != self.current_to_countries \
+            or self.current_for_event != self.current_for_event:
+
             is_create = True
+
         super().save(*args, **kwargs)
 
         if is_create:
-            DistributionItem.create_mass_dis_items(self.id, self.rec_ids.split(','))
-        elif self.rec_ids != self._past_rec_ids:
-            self.delete_all_items()
-            DistributionItem.create_mass_dis_items(self.id, self.rec_ids.split(','))
-            self._past_rec_ids = self.rec_ids
+            self._delete_all_items()
+            self._create_dist_items()
 
-    def delete_all_items(self):
+    def _delete_all_items(self):
         distribution_items = self.distributionitem_set.all()
         for item in distribution_items:
             item.delete()
+
+    def _create_dist_items(self):
+        recipients = Recipient.objects.filter(
+            event_id=self.for_event.id,
+            sex__in=self.to_sex,
+            country__in=self.to_countries
+        )
+        for recipient in recipients:
+            DistributionItem.objects.create(distribution_id=self.id, recipient_id=recipient.id).save()
 
 
 class DistributionItem(models.Model):
     distribution = models.ForeignKey(Distribution, on_delete=models.CASCADE, verbose_name='Рассылка')
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name='Получатель')
+    tried = models.BooleanField(default=False)
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
 
     class Meta:
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщения'
-
-    @staticmethod
-    def create_mass_dis_items(distribution_id, recipient_ids):
-        for rec_id in recipient_ids[:-1]:
-            print(rec_id)
-            try:
-                DistributionItem.objects.create(
-                    distribution_id=distribution_id,
-                    recipient_id=rec_id
-                )
-            except:
-                pass
 
     def __str__(self):
         return self.recipient.email

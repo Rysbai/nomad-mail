@@ -5,13 +5,6 @@ from django.utils.translation import gettext_lazy as _
 from event.models import Event, Recipient, RECIPIENT_SEX_CHOICE
 
 
-class RecipientsInLine(admin.TabularInline):
-    model = Recipient
-    fk_name = 'event'
-    fields = ('name', 'surname', 'distance', 'email')
-    extra = 1
-
-
 class EventAdmin(admin.ModelAdmin):
     list_display = ('name', )
 
@@ -70,10 +63,11 @@ class CountryListFilter(admin.SimpleListFilter):
 
 class RecipientAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname', 'birth_date', 'country', 'phone', 'email')
-
     search_fields = ('name', 'surname')
     list_filter = (EventListFilter, SexListFilter, CountryListFilter)
 
 
+admin.site.register(Event, EventAdmin)
+admin.site.register(Recipient, RecipientAdmin)
 admin.site.unregister(Group)
 admin.site.unregister(User)

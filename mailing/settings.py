@@ -17,11 +17,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'event.apps.EventConfig',
+
+    'django_extensions',
     'ckeditor_uploader',
     'ckeditor',
     'corsheaders',
+    'multiselectfield',
+    
     'distribution.apps.DistributionConfig',
+    'event.apps.EventConfig',
 ]
 
 # CELERY
