@@ -24,7 +24,10 @@ class Distribution(models.Model):
         super(Distribution, self).__init__(*args, **kwargs)
         self.current_to_sex = self.to_sex
         self.current_to_countries = self.to_countries
-        # self.current_for_event = self.for_event
+        try:
+            self.current_for_event = self.for_event
+        except:
+            pass
 
     def __str__(self):
         return self.name
@@ -33,8 +36,8 @@ class Distribution(models.Model):
         is_create = False
         if self._state.adding \
             or self.current_to_sex != self.to_sex \
-            or self.current_to_countries != self.current_to_countries \
-            or self.current_for_event != self.current_for_event:
+            or self.current_to_countries != self.to_countries \
+            or self.current_for_event != self.for_event:
 
             is_create = True
 
@@ -62,7 +65,7 @@ class Distribution(models.Model):
 class DistributionItem(models.Model):
     distribution = models.ForeignKey(Distribution, on_delete=models.CASCADE, verbose_name='Рассылка')
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name='Получатель')
-    tried = models.BooleanField(default=False)
+    is_tried_send = models.BooleanField(default=False)
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
 
     class Meta:

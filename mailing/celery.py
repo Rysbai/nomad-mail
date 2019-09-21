@@ -9,7 +9,7 @@ from celery import Celery
 from celery.schedules import crontab
 from celery.task import periodic_task
 from django.conf import settings
-from django.core.mail import get_connection, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.template import Template, loader, Context
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mailing.settings')
@@ -49,16 +49,15 @@ def put_absolute_urls(text):
     return text
 
 
-def get_messages():
+def send_messages():
     counter = Counter.objects.get(name='mail')
     html_email_template_name = "distribution/message.html"
     distribution_items = DistributionItem.objects.filter(
         distribution__is_sent=False,
         distribution__send_date__lte=datetime.datetime.now(),
-        is_sent=False
+        is_tried_send=False
     )
     index = 0
-    messages = []
     while index < len(distribution_items) and counter.count < DAY_LIMIT - 1:
         item = distribution_items[index]
 
@@ -78,21 +77,25 @@ def get_messages():
             {"message": body}
         )
         email_message.attach_alternative(html_email, 'text/html')
-        messages.append(email_message)
-
-        item.is_sent = True
-        item.save()
-        counter.count += 1
+        try:
+            email_message.send()
+        except:
+            item.is_tried_send = True
+            item.save()
+        else:
+            item.is_tried_send = True
+            item.is_sent = True
+            item.save()
+            counter.count += 1
         index += 1
 
     counter.save()
-    return messages
 
 
 def close_sent_distributions():
     distributions = Distribution.objects.filter(is_sent=False, send_date__lte=datetime.datetime.now())
     for distribution in distributions:
-        items = DistributionItem.objects.filter(distribution=distribution, is_sent=False)
+        items = DistributionItem.objects.filter(distribution=distribution, is_tried_send=False)
         if not items:
             distribution.is_sent = True
             distribution.save()
@@ -101,14 +104,7 @@ def close_sent_distributions():
 @app.task
 @periodic_task(run_every=crontab(minute=30))
 def check_time_to_distribution():
-    messages = get_messages()
-
-    if messages:
-        connection = get_connection(fail_silently=False)
-        connection.open()
-        connection.send_messages(messages)
-        connection.close()
-
+    send_messages()
     close_sent_distributions()
 
 
@@ -119,13 +115,7 @@ def send_didnt_send_distributions():
     counter.count = 0
     counter.save()
 
-    messages = get_messages()
-    if messages:
-        connection = get_connection(fail_silently=False)
-        connection.open()
-        connection.send_messages(messages)
-        connection.close()
-
+    send_messages()
     close_sent_distributions()
 
 
