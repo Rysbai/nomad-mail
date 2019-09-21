@@ -47,10 +47,11 @@ RECIPIENT_SEX_CHOICE = (
     ('М', 'М'),
     ('Ж', 'Ж')
 )
+ALL_COUNTRIES = "ALL"
 
 
 def get_countries_choices():
-    countries = []
+    countries = [(ALL_COUNTRIES, "Все страны")]
     country_list = []
     recipients = Recipient.objects.all()
 

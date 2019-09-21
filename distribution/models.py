@@ -2,7 +2,7 @@ from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from multiselectfield import MultiSelectField
 
-from event.models import Recipient, RECIPIENT_SEX_CHOICE, Event, get_countries_choices
+from event.models import Recipient, RECIPIENT_SEX_CHOICE, Event, get_countries_choices, ALL_COUNTRIES
 
 
 class Distribution(models.Model):
@@ -53,11 +53,18 @@ class Distribution(models.Model):
             item.delete()
 
     def _create_dist_items(self):
-        recipients = Recipient.objects.filter(
-            event_id=self.for_event.id,
-            sex__in=self.to_sex,
-            country__in=self.to_countries
-        )
+        to_countries = [] if ALL_COUNTRIES in self.to_countries else self.to_countries
+        if to_countries:
+            recipients = Recipient.objects.filter(
+                event_id=self.for_event.id,
+                sex__in=self.to_sex,
+                country__in=self.to_countries
+            )
+        else:
+            recipients = Recipient.objects.filter(
+                event_id=self.for_event.id,
+                sex__in=self.to_sex,
+            )
         for recipient in recipients:
             DistributionItem.objects.create(distribution_id=self.id, recipient_id=recipient.id).save()
 
