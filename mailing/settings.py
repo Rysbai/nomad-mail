@@ -120,11 +120,12 @@ CKEDITOR_RESTRICT_BY_DATE = True
 MAX_UPLOAD_SIZE = "524288"
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'full',
         'height': 400,
-        'width': 650,
+        'width': 800,
     },
 }
+MONTH_FOR_DELETE_IMAGES = 6
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT')
@@ -134,6 +135,9 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+
+EMAIL_DAY_LIMIT = 3000
+MESSAGE_TRY_LIMIT = 3
 
 BROKER_URL = os.environ.get("CLOUDAMQP_URL", 'amqp://myuser:mypassword@localhost:5672/myvhost')
 BROKER_POOL_LIMIT = 1

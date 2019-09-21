@@ -12,6 +12,8 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import Template, loader, Context
 
+from mailing.settings import EMAIL_DAY_LIMIT, MESSAGE_TRY_LIMIT, MONTH_FOR_DELETE_IMAGES
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mailing.settings')
 django.setup()
 
@@ -23,9 +25,6 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
 from distribution.models import DistributionItem, Distribution, Counter
-
-DAY_LIMIT = 3000
-MONTH_FOR_DELETE_IMAGES = 6
 
 
 def get_context(item):
@@ -55,12 +54,11 @@ def send_messages():
     distribution_items = DistributionItem.objects.filter(
         distribution__is_sent=False,
         distribution__send_date__lte=datetime.datetime.now(),
-        is_tried_send=False
+        is_sent=False,
+        try_count__lt=MESSAGE_TRY_LIMIT
     )
     index = 0
-    items = []
-    sequence_error = 0
-    while index < len(distribution_items) and counter.count < DAY_LIMIT - 1:
+    while index < len(distribution_items) and counter.count < EMAIL_DAY_LIMIT - 1:
         item = distribution_items[index]
 
         context = get_context(item)
@@ -82,10 +80,10 @@ def send_messages():
         try:
             email_message.send()
         except:
-            item.is_tried_send = True
+            item.try_count += 1
             item.save()
         else:
-            item.is_tried_send = True
+            item.try_count += 1
             item.is_sent = True
             item.save()
             counter.count += 1
@@ -97,7 +95,7 @@ def send_messages():
 def close_sent_distributions():
     distributions = Distribution.objects.filter(is_sent=False, send_date__lte=datetime.datetime.now())
     for distribution in distributions:
-        items = DistributionItem.objects.filter(distribution=distribution, is_tried_send=False)
+        items = DistributionItem.objects.filter(distribution=distribution, try_count__gte=MESSAGE_TRY_LIMIT)
         if not items:
             distribution.is_sent = True
             distribution.save()

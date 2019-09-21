@@ -65,7 +65,7 @@ class Distribution(models.Model):
 class DistributionItem(models.Model):
     distribution = models.ForeignKey(Distribution, on_delete=models.CASCADE, verbose_name='Рассылка')
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name='Получатель')
-    is_tried_send = models.BooleanField(default=False)
+    try_count = models.IntegerField(default=0)
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
 
     class Meta:
