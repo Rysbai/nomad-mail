@@ -58,6 +58,8 @@ def send_messages():
         is_tried_send=False
     )
     index = 0
+    items = []
+    sequence_error = 0
     while index < len(distribution_items) and counter.count < DAY_LIMIT - 1:
         item = distribution_items[index]
 
