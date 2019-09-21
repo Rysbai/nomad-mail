@@ -10,7 +10,7 @@ def add_mail_counter(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('distribution', '0001_initial'),
+        ('distribution', '0002_auto_20190920_1750'),
     ]
 
     operations = [

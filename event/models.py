@@ -1,6 +1,7 @@
+import os
 from django.db import models
 
-from .parser import parse_xls
+from event.parser import parse_xls
 
 
 class Event(models.Model):
@@ -21,12 +22,22 @@ class Event(models.Model):
             is_create = True
 
         super().save(*args, **kwargs)
-        if is_create:
-            Recipient.create_mass_recipients(self.id, parse_xls(self.excel_file.path))
-        elif self.excel_file != self._past_excel_file:
-            Recipient.delete_recipients_by_event_id(self.id)
-            Recipient.create_mass_recipients(self.id, parse_xls(self.excel_file.path))
-            self._past_excel_file = self.excel_file
+        if is_create or self.excel_file != self._past_excel_file:
+            self._delete_recipients()
+            self._create_recipients()
+            self._delete_file()
+
+    def _delete_recipients(self):
+        recipients = Recipient.objects.filter(event_id=self.id)
+        for recipient in recipients:
+            recipient.delete()
+
+    def _create_recipients(self):
+        for kwargs in parse_xls(self.excel_file.path):
+            Recipient.objects.create(event_id=self.id, **kwargs).save()
+
+    def _delete_file(self):
+        os.remove(self.excel_file.path)
 
     def __str__(self):
         return self.name
@@ -49,36 +60,24 @@ def get_countries_choices():
             countries.append((recipient.country, recipient.country))
 
     return tuple(countries)
-    # return tuple()
 
 
 class Recipient(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name='Мероприятие')
-    name = models.CharField(max_length=200, verbose_name='Имя')
-    surname = models.CharField(max_length=200, verbose_name='Фамилия')
-    birth_date = models.CharField(max_length=200, verbose_name='Дата рождения')
+    name = models.CharField(max_length=200, verbose_name='Имя', null=True)
+    surname = models.CharField(max_length=200, verbose_name='Фамилия', null=True)
+    birth_date = models.CharField(max_length=200, verbose_name='Дата рождения', null=True)
     sex = models.CharField(choices=RECIPIENT_SEX_CHOICE, max_length=50, verbose_name='Пол')
     country = models.CharField(max_length=100, verbose_name='Страна')
     phone = models.CharField(max_length=200, verbose_name='Телефон')
     email = models.EmailField(max_length=200, verbose_name='Email')
-    distance = models.CharField(max_length=100, verbose_name='Дистанция')
-    register_date = models.CharField(max_length=100, verbose_name='Дата регистрации')
-    pay_status = models.CharField(max_length=100, verbose_name='Статус оплаты')
+    distance = models.CharField(max_length=100, verbose_name='Дистанция',  null=True)
+    register_date = models.CharField(max_length=100, verbose_name='Дата регистрации', null=True)
+    pay_status = models.CharField(max_length=100, verbose_name='Статус оплаты', null=True)
 
     class Meta:
         verbose_name = 'Участник'
         verbose_name_plural = 'Участники'
-
-    @staticmethod
-    def create_mass_recipients(event_id, args):
-        for kwargs in args:
-            Recipient.objects.create(event_id=event_id, **kwargs).save()
-
-    @staticmethod
-    def delete_recipients_by_event_id(event_id):
-        recipients = Recipient.objects.filter(event_id=event_id)
-        for recipient in recipients:
-            recipient.delete()
 
     def __str__(self):
         return self.name + " " + self.surname
