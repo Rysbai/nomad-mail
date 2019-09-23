@@ -2,11 +2,19 @@ from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.utils.translation import gettext_lazy as _
 
-from event.models import Event, Recipient, RECIPIENT_SEX_CHOICE
+from event.models import Event, Recipient
+from event.constants import RECIPIENT_SEX_CHOICE
 
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ('name', )
+    fieldsets = (
+        ('None', {'fields': ('name', 'excel_file')}),
+        ('Колонки excel файла', {
+            'fields': ('name_col', 'surname_col', 'birth_date_col', 'sex_col',
+                       'country_col', 'phone_col', 'email_col', 'distance_col', 'register_date_col', 'pay_status_col')}
+         )
+    )
 
 
 class EventListFilter(admin.SimpleListFilter):

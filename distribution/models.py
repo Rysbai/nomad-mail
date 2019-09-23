@@ -2,7 +2,9 @@ from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from multiselectfield import MultiSelectField
 
-from event.models import Recipient, RECIPIENT_SEX_CHOICE, Event, get_countries_choices, ALL_COUNTRIES
+from event.models import Recipient, Event
+from event.constants import RECIPIENT_SEX_CHOICE, ALL_COUNTRIES
+from event.models import get_countries_choices
 
 
 class Distribution(models.Model):
