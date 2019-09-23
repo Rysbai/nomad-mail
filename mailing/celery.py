@@ -48,16 +48,21 @@ def put_absolute_urls(text):
     return text
 
 
-def send_messages():
-    counter = Counter.objects.get(name='mail')
-    html_email_template_name = "distribution/message.html"
-    distribution_items = DistributionItem.objects.filter(
+def get_didnt_send_dist_items():
+    return DistributionItem.objects.filter(
         distribution__is_sent=False,
         distribution__send_date__lte=datetime.datetime.now(),
         is_sent=False,
         try_count__lt=MESSAGE_TRY_LIMIT
     )
+
+
+def send_messages():
+    counter = Counter.objects.get(name='mail')
+    html_email_template_name = "distribution/message.html"
+    distribution_items = get_didnt_send_dist_items()
     index = 0
+
     while index < len(distribution_items) and counter.count < EMAIL_DAY_LIMIT - 1:
         item = distribution_items[index]
 

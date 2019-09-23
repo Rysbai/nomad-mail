@@ -54,17 +54,14 @@ class Distribution(models.Model):
 
     def _create_dist_items(self):
         to_countries = [] if ALL_COUNTRIES in self.to_countries else self.to_countries
+
+        recipients = Recipient.objects.filter(
+            event_id=self.for_event.id,
+            sex__in=self.to_sex,
+        )
         if to_countries:
-            recipients = Recipient.objects.filter(
-                event_id=self.for_event.id,
-                sex__in=self.to_sex,
-                country__in=self.to_countries
-            )
-        else:
-            recipients = Recipient.objects.filter(
-                event_id=self.for_event.id,
-                sex__in=self.to_sex,
-            )
+            recipients = recipients.filter(country__in=self.to_countries)
+
         for recipient in recipients:
             DistributionItem.objects.create(distribution_id=self.id, recipient_id=recipient.id).save()
 
