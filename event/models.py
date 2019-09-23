@@ -18,7 +18,7 @@ class Event(models.Model):
     email_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Email')
     distance_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Дистанция')
     register_date_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Дата регистрации')
-    pay_status_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Статуч оплаты')
+    pay_status_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Статус оплаты')
 
     class Meta:
         verbose_name = 'Мероприятие'
