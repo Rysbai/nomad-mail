@@ -9,16 +9,16 @@ class Event(models.Model):
     name = models.CharField(max_length=200, verbose_name='Имя')
     excel_file = models.FileField(upload_to="event/", verbose_name='Excel с участниками')
 
-    name_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Имя')
-    surname_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Фамилия')
-    birth_date_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='День рождения')
-    sex_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Пол')
-    country_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Страна')
-    phone_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Телефон')
-    email_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Email')
-    distance_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Дистанция')
-    register_date_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Дата регистрации')
-    pay_status_col = models.CharField(max_length=MAX_COL_CHAR, default='a', verbose_name='Статус оплаты')
+    name_col = models.CharField(max_length=MAX_COL_CHAR, default='A', verbose_name='Имя')
+    surname_col = models.CharField(max_length=MAX_COL_CHAR, default='B', verbose_name='Фамилия')
+    birth_date_col = models.CharField(max_length=MAX_COL_CHAR, default='C', verbose_name='День рождения')
+    sex_col = models.CharField(max_length=MAX_COL_CHAR, default='D', verbose_name='Пол')
+    country_col = models.CharField(max_length=MAX_COL_CHAR, default='E', verbose_name='Страна')
+    phone_col = models.CharField(max_length=MAX_COL_CHAR, default='F', verbose_name='Телефон')
+    email_col = models.CharField(max_length=MAX_COL_CHAR, default='G', verbose_name='Email')
+    distance_col = models.CharField(max_length=MAX_COL_CHAR, default='H', verbose_name='Дистанция')
+    register_date_col = models.CharField(max_length=MAX_COL_CHAR, default='I', verbose_name='Дата регистрации')
+    pay_status_col = models.CharField(max_length=MAX_COL_CHAR, default='J', verbose_name='Статус оплаты')
 
     class Meta:
         verbose_name = 'Мероприятие'
