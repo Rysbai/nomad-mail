@@ -1,0 +1,37 @@
+{% load static %}
+<link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+{#<link rel="stylesheet" type="text/css" href="https://bootswatch.com/superhero/bootstrap.min.css">#}
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'distribution/css/jquery.dropdown.css' %}">
+<script src="{% static 'distribution/js/jquery.dropdown.js' %}"></script>
+
+<br/>
+<br/>
+<br/>
+<input type="text" style="display: none" name="{{ name }}" id="{{ id }}">
+<div class="dropdown-mul-1">
+    <select style="display:none"  id="country_select" multiple placeholder="Select"> </select>
+</div>
+<script>
+    const values = {{ values|safe }};
+    const selected = {{ selected|safe }};
+    document.getElementsByName('{{ name }}')[0].value = selected.join(',');
+    let data = [];
+    values.forEach(( value ) => {
+        data.push({
+            name: value,
+            id: value,
+            "disabled": false,
+            "selected": selected.includes(value)
+        })
+    });
+    $('.dropdown-mul-1').dropdown({
+        data: data,
+        limitCount: 40,
+        multipleMode: 'label',
+        choice: function (e) {
+            document.getElementsByName('{{ name }}')[0].value = !($('#country_select').val() === null) ? $('#country_select').val().join(',') : ""
+        }
+    });
+</script>
+

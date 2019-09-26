@@ -1,7 +1,7 @@
 import os
 from django.db import models
 
-from event.constants import MAX_COL_CHAR, RECIPIENT_SEX_CHOICE, ALL_COUNTRIES
+from event.constants import MAX_COL_CHAR, RECIPIENT_SEX_CHOICE, ALL
 from event.utils import parse_xls, get_col_number
 
 
@@ -141,7 +141,7 @@ class Recipient(models.Model):
 
 
 def get_countries_choices():
-    countries = [(ALL_COUNTRIES, "Все страны")]
+    countries = [(ALL, "Все страны")]
     country_list = []
     recipients = Recipient.objects.all()
 
@@ -151,3 +151,14 @@ def get_countries_choices():
             countries.append((recipient.country, recipient.country))
 
     return tuple(countries)
+
+
+def get_countries_list():
+    country_list = [ALL]
+    recipients = Recipient.objects.all()
+
+    for recipient in recipients:
+        if recipient.country not in country_list:
+            country_list.append(recipient.country)
+
+    return country_list

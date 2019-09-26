@@ -2,7 +2,7 @@ RECIPIENT_SEX_CHOICE = (
     ('М', 'М'),
     ('Ж', 'Ж')
 )
-ALL_COUNTRIES = "ALL"
+ALL = "Всем странам"
 
 MAX_COL_CHAR = 2
 CODES = {

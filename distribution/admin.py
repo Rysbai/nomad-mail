@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from django.utils.translation import gettext_lazy as _
 
+from distribution.forms import DistributionCreateForm
 from distribution.models import Distribution, DistributionItem
 
 
@@ -15,6 +16,7 @@ class DistributionItemInLine(admin.StackedInline):
 
 
 class DistributionAdmin(admin.ModelAdmin):
+    form = DistributionCreateForm
     list_display = ('name', 'for_event', 'send_date', 'is_sent')
     fieldsets = (
         (None, {

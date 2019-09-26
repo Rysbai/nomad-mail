@@ -3,7 +3,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from multiselectfield import MultiSelectField
 
 from event.models import Recipient, Event
-from event.constants import RECIPIENT_SEX_CHOICE, ALL_COUNTRIES
+from event.constants import RECIPIENT_SEX_CHOICE, ALL
 from event.models import get_countries_choices
 
 
@@ -15,7 +15,7 @@ class Distribution(models.Model):
     is_sent = models.BooleanField(default=False, verbose_name='Отправлено')
 
     to_sex = MultiSelectField(choices=RECIPIENT_SEX_CHOICE, verbose_name='Пол')
-    to_countries = MultiSelectField(choices=get_countries_choices(), verbose_name='Страны')
+    to_countries = models.CharField(verbose_name='Страны', max_length=5000)
     for_event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name='Мероприятие')
 
     class Meta:
@@ -28,7 +28,7 @@ class Distribution(models.Model):
         self.current_to_countries = self.to_countries
         try:
             self.current_for_event = self.for_event
-        except:
+        except Exception as e:
             pass
 
     def __str__(self):
@@ -36,16 +36,15 @@ class Distribution(models.Model):
 
     def save(self, *args, **kwargs):
         is_create = False
-        if self._state.adding \
-            or self.current_to_sex != self.to_sex \
-            or self.current_to_countries != self.to_countries \
-            or self.current_for_event != self.for_event:
-
+        if self._state.adding:
             is_create = True
 
         super().save(*args, **kwargs)
 
-        if is_create:
+        if is_create \
+                or self.current_to_sex != self.to_sex \
+                or self.current_to_countries != self.to_countries \
+                or self.current_for_event != self.for_event:
             self._delete_all_items()
             self._create_dist_items()
 
@@ -55,14 +54,14 @@ class Distribution(models.Model):
             item.delete()
 
     def _create_dist_items(self):
-        to_countries = [] if ALL_COUNTRIES in self.to_countries else self.to_countries
+        to_countries = [] if ALL in self.to_countries.split(',') else self.to_countries.split(',')
 
         recipients = Recipient.objects.filter(
             event_id=self.for_event.id,
             sex__in=self.to_sex,
         )
         if to_countries:
-            recipients = recipients.filter(country__in=self.to_countries)
+            recipients = recipients.filter(country__in=to_countries)
 
         for recipient in recipients:
             DistributionItem.objects.create(distribution_id=self.id, recipient_id=recipient.id).save()
